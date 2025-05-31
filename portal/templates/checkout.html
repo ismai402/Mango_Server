@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Checkout</h2>
+    <form method="POST" action="{% url 'process_checkout' %}">
+        {% csrf_token %}
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="first_name">First Name</label>
+                <input type="text" name="first_name" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="last_name">Last Name</label>
+                <input type="text" name="last_name" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="address">Address</label>
+            <input type="text" name="address" class="form-control" required>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="city">City</label>
+                <input type="text" name="city" class="form-control" required>
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="zip_code">Zip Code</label>
+                <input type="text" name="zip_code" class="form-control" required>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="payment_method">Payment Method</label>
+            <select name="payment_method" id="payment_method" class="form-control" required
+                onchange="togglePaymentInstructions()">
+                <option value="cash">Cash on Delivery</option>
+                <option value="mobile">bKash / Nagad / Rocket</option>
+            </select>
+        </div>
+
+        <div id="payment_instructions" style="display: none;" class="alert alert-warning mt-3">
+            <p><strong>Please send your payment to:</strong></p>
+            <h4><b id="payment_number">01568226500</b></h4>
+            <button type="button" class="btn btn-sm btn-info" onclick="copyNumber()">Copy Number</button>
+            <p class="mt-3 mb-1">After sending payment, enter your Transaction ID:</p>
+            <input type="text" name="transaction_id" class="form-control" placeholder="Transaction ID">
+        </div>
+
+        <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary px-4">Order Confirm</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function togglePaymentInstructions() {
+        const method = document.getElementById('payment_method').value;
+        const instructions = document.getElementById('payment_instructions');
+        instructions.style.display = (method === 'mobile') ? 'block' : 'none';
+    }
+
+    function copyNumber() {
+        const number = document.getElementById('payment_number').innerText;
+        navigator.clipboard.writeText(number).then(() => {
+            alert("Number copied: " + number);
+        });
+    }
+</script>
+{% endblock %}

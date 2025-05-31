@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-5 text-primary fw-bold">
+        <i class="bi bi-cart3"></i> Your Cart
+    </h2>
+    
+    {% if cart_items %}
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Product</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-end">Price (each)</th>
+                    <th class="text-end">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cart_items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td class="text-center">{{ item.quantity }}</td>
+                    <td class="text-end">৳ {{ item.product.price }}</td>
+                    <td class="text-end">৳ {{ item.subtotal }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Total and Actions -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <a href="{% url 'products' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Continue Shopping
+        </a>
+        <div class="text-end">
+            <div class="fw-bold fs-5 text-success">Total: ৳ {{ total_price }}</div>
+            <a href="{% url 'checkout' %}" class="btn btn-success mt-2">
+                <i class="bi bi-credit-card-2-back"></i> Proceed to Checkout
+            </a>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="text-center my-5">
+        <i class="bi bi-cart-x display-1 text-muted"></i>
+        <p class="fs-4 text-muted mt-3">Your cart is empty.</p>
+        <a href="{% url 'products' %}" class="btn btn-warning text-white fw-semibold">
+            <i class="bi bi-bag-plus"></i> Shop Now
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Include Bootstrap Icons if not already loaded -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+{% endblock %}

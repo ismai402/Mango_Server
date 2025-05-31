@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-sm p-4">
+        <div class="row">
+            <div class="col-md-5">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+                {% else %}
+                    <img src="https://via.placeholder.com/300" class="img-fluid rounded" alt="No Image">
+                {% endif %}
+            </div>
+
+            <div class="col-md-7">
+                <h2 class="mb-3">{{ product.name }}</h2>
+                <p class="text-muted mb-2">Price: <strong>৳{{ product.price }}</strong></p>
+                <p>{{ product.description }}</p>
+
+                <!-- Add to Cart form -->
+                <form id="addToCartForm" action="{% url 'add_to_cart' product.id %}" method="post" class="d-inline-block me-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="quantity" id="hiddenQty" value="{{ current_quantity|default:1 }}">
+
+                    {% if product.stock > 0 %}
+                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                    {% else %}
+                        <button type="button" class="btn btn-secondary" disabled>Out of Stock</button>
+                    {% endif %}
+                </form>
+
+                <!-- Quantity Controls -->
+                {% if product.stock > 0 %}
+                <div class="d-inline-block">
+                    <div class="d-flex align-items-center">
+                        <button type="button" class="btn btn-danger btn-sm me-2" onclick="changeQty(-1)">−</button>
+                        <div id="qtyDisplay" class="px-3 fw-bold fs-5">{{ current_quantity|default:1 }}</div>
+                        <button type="button" class="btn btn-success btn-sm ms-2" onclick="changeQty(1)">+</button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let quantity = {{ current_quantity|default:"1" }};
+    const maxStock = {{ product.stock }};
+
+    function changeQty(change) {
+        if (maxStock === 0) return; // skip if out of stock
+
+        quantity += change;
+        if (quantity < 1) quantity = 1;
+        if (quantity > maxStock) quantity = maxStock;
+
+        document.getElementById("qtyDisplay").textContent = quantity;
+        document.getElementById("hiddenQty").value = quantity;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="text-center mb-4">📋 My Orders</h2>
+
+    {% if orders %}
+    <div class="list-group">
+        {% for order in orders %}
+        <div class="list-group-item list-group-item-action mb-2 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-1">🆔 Order ID: {{ order.id }}</h5>
+                <small class="text-muted">{{ order.created_at|date:"M d, Y - H:i" }}</small>
+            </div>
+            <p class="mb-1">
+                <strong>Name:</strong> {{ order.first_name }} {{ order.last_name }}<br>
+                <strong>City:</strong> {{ order.city }}<br>
+                <strong>Zip Code:</strong> {{ order.zip_code }}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center text-muted">No orders found.</p>
+    {% endif %}
+</div>
+{% endblock %}

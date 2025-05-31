@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center">
+        <h1 class="display-4 fw-bold">Welcome to Mango Lover🥭</h1>
+        <p class="lead">Fresh, juicy mangoes directly from the orchard to your door.</p>
+        <a href="/products/" class="btn btn-success btn-lg mt-3 px-4">Browse Mangoes</a>
+    </div>
+
+    <!-- Optional: Feature Highlights Section -->
+    <div class="row mt-5">
+        <div class="col-md-4 text-center">
+            <i class="bi bi-truck display-6 text-success"></i>
+            <h5 class="mt-2 fw-semibold">Fast Delivery</h5>
+            <p>Get your mangoes delivered within 24 hours, fresh and chilled.</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <i class="bi bi-bag-check display-6 text-success"></i>
+            <h5 class="mt-2 fw-semibold">Handpicked Quality</h5>
+            <p>Each mango is selected with care for ripeness and flavor.</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <i class="bi bi-shield-check display-6 text-success"></i>
+            <h5 class="mt-2 fw-semibold">Satisfaction Guaranteed</h5>
+            <p>We stand by our fruit. If it’s not perfect, it’s on us.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
