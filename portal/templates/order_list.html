@@ -7,16 +7,23 @@
     {% if orders %}
     <div class="list-group">
         {% for order in orders %}
-        <div class="list-group-item list-group-item-action mb-2 shadow-sm">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-1">🆔 Order ID: {{ order.id }}</h5>
+        <div class="list-group-item list-group-item-action mb-3 shadow-sm rounded-3 border-0">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="mb-0">🆔 Order ID: {{ order.id }}</h5>
                 <small class="text-muted">{{ order.created_at|date:"M d, Y - H:i" }}</small>
             </div>
-            <p class="mb-1">
+            <div class="mb-2">
                 <strong>Name:</strong> {{ order.first_name }} {{ order.last_name }}<br>
                 <strong>City:</strong> {{ order.city }}<br>
-                <strong>Zip Code:</strong> {{ order.zip_code }}
-            </p>
+                <strong>Zip Code:</strong> {{ order.zip_code }}<br>
+                <strong>Delivery Method:</strong> {{ order.delivery_method }}<br>
+                <strong>Delivery Price:</strong> ৳{{ order.delivery_price|floatformat:2 }}
+            </div>
+            <div class="mb-2">
+                <strong>Items Total:</strong> ৳{{ order.order_items_total|floatformat:2 }}<br>
+                <strong>Total (with Delivery):</strong>
+                <span class="text-success fw-bold">৳{{ order.total_price_with_delivery|floatformat:2 }}</span>
+            </div>
         </div>
         {% endfor %}
     </div>

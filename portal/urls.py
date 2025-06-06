@@ -20,6 +20,7 @@ urlpatterns = [
     path('products/', views.product_list, name='product_list'),
     path('products/<int:id>/', views.product_detail, name='product_detail'),
     # path('products/cart/update/<int:id>/', views.update_cart_quantity, name='update_cart_quantity'),
+    path('buy_now/<int:product_id>/', views.buy_now, name='buy_now'),
 
 
 

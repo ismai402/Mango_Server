@@ -6,38 +6,53 @@
         <div class="row">
             <div class="col-md-5">
                 {% if product.image %}
-                    <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+                <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
                 {% else %}
-                    <img src="https://via.placeholder.com/300" class="img-fluid rounded" alt="No Image">
+                <img src="https://via.placeholder.com/300" class="img-fluid rounded" alt="No Image">
                 {% endif %}
             </div>
 
             <div class="col-md-7">
                 <h2 class="mb-3">{{ product.name }}</h2>
                 <p class="text-muted mb-2">Price: <strong>৳{{ product.price }}</strong></p>
-                <p>{{ product.description }}</p>
+                <p class="mb-3">{{ product.description }}</p>
+                <p class="mb-3">Stock: {{ product.stock }}</p>
 
-                <!-- Add to Cart form -->
-                <form id="addToCartForm" action="{% url 'add_to_cart' product.id %}" method="post" class="d-inline-block me-3">
-                    {% csrf_token %}
-                    <input type="hidden" name="quantity" id="hiddenQty" value="{{ current_quantity|default:1 }}">
-
-                    {% if product.stock > 0 %}
-                        <button type="submit" class="btn btn-primary">Add to Cart</button>
-                    {% else %}
-                        <button type="button" class="btn btn-secondary" disabled>Out of Stock</button>
-                    {% endif %}
-                </form>
-
-                <!-- Quantity Controls -->
                 {% if product.stock > 0 %}
-                <div class="d-inline-block">
+                <!-- Quantity Controls -->
+                <div class="mb-4">
+                    <label class="form-label">Quantity:</label>
                     <div class="d-flex align-items-center">
-                        <button type="button" class="btn btn-danger btn-sm me-2" onclick="changeQty(-1)">−</button>
-                        <div id="qtyDisplay" class="px-3 fw-bold fs-5">{{ current_quantity|default:1 }}</div>
-                        <button type="button" class="btn btn-success btn-sm ms-2" onclick="changeQty(1)">+</button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm me-2"
+                            onclick="changeQty(-1)">−</button>
+                        <div id="qtyDisplay" class="px-3 fw-bold fs-5">1</div>
+                        <button type="button" class="btn btn-outline-secondary btn-sm ms-2"
+                            onclick="changeQty(1)">+</button>
                     </div>
                 </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-3">
+                    <!-- Add to Cart form -->
+                    <form id="addToCartForm" action="{% url 'add_to_cart' product.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" id="hiddenQty" value="1">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-cart-plus"></i> Add to Cart
+                        </button>
+                    </form>
+
+                    <!-- Buy Now form -->
+                    <form id="buyNowForm" action="{% url 'buy_now' product.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="quantity" id="hiddenQtyBuyNow" value="1">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-lightning"></i> Buy Now
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <button type="button" class="btn btn-secondary btn-lg" disabled>Out of Stock</button>
                 {% endif %}
             </div>
         </div>
@@ -45,11 +60,11 @@
 </div>
 
 <script>
-    let quantity = {{ current_quantity|default:"1" }};
-    const maxStock = {{ product.stock }};
+    let quantity = 1;
+    const maxStock = JSON.parse('{{ product.stock|default:"0"|escapejs }}');
 
     function changeQty(change) {
-        if (maxStock === 0) return; // skip if out of stock
+        if (maxStock === 0) return;
 
         quantity += change;
         if (quantity < 1) quantity = 1;
@@ -57,6 +72,7 @@
 
         document.getElementById("qtyDisplay").textContent = quantity;
         document.getElementById("hiddenQty").value = quantity;
+        document.getElementById("hiddenQtyBuyNow").value = quantity;
     }
 </script>
 {% endblock %}

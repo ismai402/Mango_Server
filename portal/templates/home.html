@@ -26,5 +26,48 @@
             <p>We stand by our fruit. If it’s not perfect, it’s on us.</p>
         </div>
     </div>
+
+    <div class="container my-5">
+        <h2 class="text-center mb-4">Available Mangoes 🥭</h2>
+
+        {% if products %}
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <p class="card-text text-muted small">{{ product.description|truncatechars:100 }}</p>
+                        <p class="fw-semibold text-success">৳ {{ product.price }}</p>
+
+                        {% if product.stock > 0 %}
+                        <span class="badge bg-success mb-2">In Stock: {{ product.stock }}</span>
+                        {% else %}
+                        <span class="badge bg-danger mb-2">Out of Stock</span>
+                        {% endif %}
+
+                        <div class="mt-auto">
+                            <!-- <a href="/products/{{ product.id }}/" class="btn btn-outline-primary mb-2 w-100">View
+                            Details</a> -->
+                            {% if product.stock > 0 %}
+                            <a href="/products/{{ product.id }}/" class="btn btn-outline-primary mb-2 w-100">View
+                                Details</a>
+
+                            {% else %}
+                            <a href="/products/{{ product.id }}/" class="btn btn-outline-primary mb-2 w-100">View
+                                Details</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-center text-muted">No mangoes available right now. Please check back later!</p>
+        {% endif %}
+    </div>
 </div>
+
 {% endblock %}

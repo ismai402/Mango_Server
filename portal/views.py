@@ -12,13 +12,13 @@ from .forms import ProductForm
 from .models import Product, CartItem, Order, OrderItem
 
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def home(request):
     products = Product.objects.all()[:4]  # get first 4 products for featured
     return render(request, 'home.html', {'products': products})
 
 
-@login_required(login_url='login')
+# @login_required(login_url='login')
 def about(request):
     return render(request, 'about.html')
 
@@ -73,17 +73,60 @@ def product_list(request):
 
 
 # views.py
+# def product_detail(request, id):
+#     product = get_object_or_404(Product, id=id)
+#     cart_item = CartItem.objects.filter(
+#         product=product, user=request.user).first()
+#     current_quantity = cart_item.quantity if cart_item else 1
+
+#     return render(request, 'product_detail.html', {
+#         'product': product,
+#         'current_quantity': current_quantity
+#     })
+
 def product_detail(request, id):
     product = get_object_or_404(Product, id=id)
-    cart_item = CartItem.objects.filter(
-        product=product, user=request.user).first()
-    current_quantity = cart_item.quantity if cart_item else 1
+
+    cart = request.session.get('cart', {})
+    current_quantity = cart.get(str(product.id), 1)
 
     return render(request, 'product_detail.html', {
         'product': product,
         'current_quantity': current_quantity
     })
 
+
+# def add_to_cart(request, product_id):
+#     product = get_object_or_404(Product, id=product_id)
+#     requested_quantity = int(request.POST.get('quantity', 1))
+
+#     if requested_quantity < 1:
+#         requested_quantity = 1
+
+#     cart = request.session.get('cart', {})
+#     current_in_cart = cart.get(str(product_id), 0)
+
+#     remaining_stock = product.stock - current_in_cart
+
+#     if remaining_stock <= 0:
+#         messages.error(
+#             request, f"{product.name} already in cart with max available stock!")
+#         return redirect('product_detail', id=product.id)
+
+#     # Limit to remaining stock
+#     final_quantity_to_add = min(requested_quantity, remaining_stock)
+#     cart[str(product_id)] = current_in_cart + final_quantity_to_add
+#     request.session['cart'] = cart
+
+#     if final_quantity_to_add < requested_quantity:
+#         messages.warning(
+#             request, f"Only {final_quantity_to_add} more of {product.name} added. Stock limit reached."
+#         )
+#     else:
+#         messages.success(
+#             request, f"{product.name} added to cart (Quantity: {final_quantity_to_add})!")
+
+#     return redirect('product_detail', id=product.id)
 
 def add_to_cart(request, product_id):
     product = get_object_or_404(Product, id=product_id)
@@ -106,6 +149,7 @@ def add_to_cart(request, product_id):
     final_quantity_to_add = min(requested_quantity, remaining_stock)
     cart[str(product_id)] = current_in_cart + final_quantity_to_add
     request.session['cart'] = cart
+    request.session.modified = True
 
     if final_quantity_to_add < requested_quantity:
         messages.warning(
@@ -118,7 +162,7 @@ def add_to_cart(request, product_id):
     return redirect('product_detail', id=product.id)
 
 
-@login_required
+# @login_required
 def cart_view(request):
     cart = request.session.get('cart', {})
     cart_items = []
@@ -192,6 +236,9 @@ def process_checkout(request):
     address = request.POST.get('address')
     city = request.POST.get('city')
     zip_code = request.POST.get('zip_code')
+    delivery_method = request.POST['delivery_method']
+    package_price = float(request.POST.get('package_weight_price', 0))  # You may pass it hidden
+    delivery_charge = 150.0 if delivery_method == 'home' else 0.0
 
     order = Order.objects.create(
         customer=request.user,
@@ -199,7 +246,10 @@ def process_checkout(request):
         last_name=last_name,
         address=address,
         city=city,
-        zip_code=zip_code
+        zip_code=zip_code,
+        delivery_method=delivery_method,
+        delivery_charge=delivery_charge,
+        package_price=package_price,
     )
 
     cart = request.session.get('cart', {})
@@ -230,7 +280,7 @@ def process_checkout(request):
     return render(request, 'greatful.html', {'name': first_name, 'order': order})
 
 
-@login_required
+
 @staff_member_required
 def add_product(request):
     if request.method == 'POST':
@@ -243,7 +293,7 @@ def add_product(request):
     return render(request, 'add_product.html', {'form': form})
 
 
-@login_required
+
 @staff_member_required
 def delete_products(request):
     products = Product.objects.all()
@@ -345,7 +395,7 @@ def order_list(request):
 #     return redirect('product_detail', id=product_id)
 
 
-@login_required
+
 def update_cart_quantity(request, product_id):
     if request.method == 'POST':
         try:
@@ -382,10 +432,11 @@ def update_cart_quantity(request, product_id):
     return redirect('product_detail', id=product_id)
 
 
-@login_required
+
 @staff_member_required
 def admin_dashboard(request):
-    return render(request, 'admin_dashboard.html')
+    orders = Order.objects.all().order_by('-created_at')
+    return render(request, 'admin_dashboard.html', {'orders': orders})
 
 
 # views.py
@@ -407,3 +458,9 @@ def admin_dashboard(request):
 #             CartItem.objects.create(product=product, user=request.user, quantity=quantity)
 
 #         return redirect('product_detail', id=id)
+
+
+def buy_now(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    request.session['cart'] = {str(product_id): 1}
+    return redirect('checkout')

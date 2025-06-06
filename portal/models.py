@@ -33,8 +33,20 @@ class Order(models.Model):
     address = models.TextField()
     city = models.CharField(max_length=100, null=True, blank=True)
     zip_code = models.CharField(max_length=20, null=True, blank=True)
+    delivery_method = models.CharField(max_length=100, default="Inside Dhaka")  # or "Outside Dhaka"
+    delivery_price = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    package_price = models.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def order_items_total(self):
+        return sum(item.price * item.quantity for item in self.items.all())
 
+    def total_price_with_delivery(self):
+        return self.order_items_total() + self.delivery_price
+
+    def total_price(self):
+        return self.package_price + self.delivery_charge
+    
     def __str__(self):
         return f"Order #{self.id} - {self.first_name} {self.last_name}"
 
